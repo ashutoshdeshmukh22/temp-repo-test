@@ -1,0 +1,45 @@
+{% extends '../base.html' %}
+
+{% block title %} Playground Admin {% endblock %}
+
+{% block content %}
+
+
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="page-header d-print-none">
+                <div class="row align-items-center">
+            
+                    
+
+                </div>
+        </div>
+    </div>
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    {% if client.user.is_superuser %}
+                    <h1> Welcome - 100000 </h1>
+                    {% else %}
+                    <h1> Welcome - {{ client.parent_id }}{{ client.client_id }} </h1>
+                    {% endif %}
+                    <br />
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title"> Active Users : {{ total_user_count }} </h3>
+                    <h3 class="card-title"> Active Transactions : {{ total_active_transactions_count }} </h3>
+                    <h3 class="card-title"> Active Squared Of Transactions : {{ total_squaredoff_transactions }} </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+
+{% endblock %}

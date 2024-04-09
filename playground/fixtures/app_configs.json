@@ -1,0 +1,56 @@
+[{
+    "model": "playground.app_configs",
+    "pk": 1,
+    "fields":{
+        "id":"1",
+        "name":"initial_limit",
+        "description":"initial limit",
+        "value":"50000",
+        "created_at":"2023-06-15 12:47:30.000000",
+        "updated_at":"2023-06-15 12:47:30.000000"
+    }
+},{
+    "model": "playground.app_configs",
+    "pk": 2,
+    "fields":{
+        "id":"2",
+        "name":"app_name",
+        "description":"Application Name",
+        "value":"Melody",
+        "created_at":"2023-06-15 12:47:30.000000",
+        "updated_at":"2023-06-15 12:47:30.000000"
+    }
+},{
+    "model": "playground.app_configs",
+    "pk": 3,
+    "fields":{
+        "id":"3",
+        "name":"canSubAdminCreateUser",
+        "description":"Can you subadmin create new client acccounts",
+        "value": true,
+        "created_at":"2023-06-15 12:47:30.000000",
+        "updated_at":"2023-06-15 12:47:30.000000"
+    }
+},{
+    "model": "playground.app_configs",
+    "pk": 4,
+    "fields":{
+        "id":"4",
+        "name":"appMaintananceMode",
+        "description":"wether the app should be run normally or activate the Maintanance Mode.",
+        "value": true,
+        "created_at":"2023-06-15 12:47:30.000000",
+        "updated_at":"2023-06-15 12:47:30.000000"
+    }
+},{
+    "model": "playground.app_configs",
+    "pk": 5,
+    "fields":{
+        "id":"5",
+        "name":"sherkhan_api_token",
+        "description":"",
+        "value": "",
+        "created_at":"2023-06-15 12:47:30.000000",
+        "updated_at":"2023-06-15 12:47:30.000000"
+    }
+}]

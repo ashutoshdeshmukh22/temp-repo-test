@@ -1,0 +1,337 @@
+{% extends '../base.html' %}
+
+{% block title %} Settings | Melody {% endblock %}
+
+{% block content %}
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+<script type="text/javascript"> data = "{{ scripts }}"; </script>
+
+<style>
+    input[name='lot_size'] {
+        width: 50%;
+    }
+</style>
+
+{% if client.user.is_superuser == 1 %}
+
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">User Details</div>
+                    <h2 class="page-title"> {{ client.user.first_name }}</h2>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        
+                        <span class="d-none d-sm-inline">
+                            <a href="" target="_blank" class="btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                    <path d="M16 5l3 3"></path>
+                                 </svg>
+                                Edit Details
+                            </a>
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body display_inline_flex">
+                    <div class="col-md-8">
+                        <div class="form-label bold-font ">Access Token</div>
+                        <input type="text" name="AccessToken_id" class="form-control AccessToken_id" value="">
+                    </div>
+                    <div class="p-3"></div>
+                    <div class="col-md-3"><br>
+                        <div class="form-label bold-font "></div>
+                        <input type="button" name="update_access_token" class="btn btn-primary update_access_token" value="Update Access Token"/>
+                        <a target="_blank" href="https://api.sharekhan.com/skapi/auth/login.html?api_key=2ndfeZojiGUjxuBaHvjsvwG7UIS4CZhH&&version_id=1005" class="btn btn-success get_access_token" > Generate Token </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </br>
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body display_inline_flex">
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Client ID</div>
+                        <input type="text" name="client_id" class="form-control" value="{{ client.user.username }}" disabled>
+                    </div>
+                    
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Name</div>
+                        <input type="text" name="name" class="form-control" value="{{ client.user.first_name }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Email</div>
+                        <input type="email" name="email" class="form-control" value="{{ client.user.email }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Phone</div>
+                        <input type="text" name="phone" class="form-control" value="{{ client.phone }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Limit</div>
+                        <input type="number" name="limit" class="form-control" value="{{ client.limit }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    
+                    <div class="col-md"><br>
+                        <div class="form-label bold-font "></div>
+                        <input type="button" name="cancel" class="btn" value="Cancel"/>&nbsp;&nbsp; 
+                        <input type="button" name="update" class="btn btn-primary" value="Update"/>
+                    </div>
+
+                </div>
+            </div>
+            </br>
+
+            <div class="col-12">
+                <form class="card">
+                    {% csrf_token %}
+                  <div class="card-body">
+                    <h3 class="card-title">Edit Profile</h3>
+                    <div class="row row-cards">
+                      <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="symbol">Symbol:</label>
+                            <select id="symbol" class="form-control">
+                                <option value="">All</option>
+                                <option value="GOLD">GOLD</option>
+                                <option value="SILVER">SILVER</option>
+                                <option value="ALUMINI">ALUMINI</option>
+                                <option value="COPPER">COPPER</option>
+                                <option value="CRUDEOIL">CRUDEOIL</option>
+                                <option value="NICKEL">NICKEL</option>
+                                <option value="ZINC">ZINC</option>
+                                <!-- Add more symbols as needed -->
+                            </select>                 
+                        </div>
+                      </div>
+                      <div class="col-sm-3 col-md-3">
+                        <div class="mb-3">
+                            <label for="expiry">Expiry Date:</label>
+                            <select class="form-control" id="script_expiry">
+                              <option value="" selected disabled>Expiry Date</option>
+                              <!-- Options will be populated dynamically using JavaScript -->
+                            </select>
+                        </div>
+                      </div>
+                      
+                      <div class="col-sm-1 col-md-1 d-flex align-items-center justify-content-center">
+                        <div class="mb-3"><br>
+                          <button type="button" id="addScript" class="btn btn-primary">Add Script</button>
+                        </div>
+                      </div>
+
+                      <div style="margin-left: 40px;" class="col-sm-1 col-md-1 d-flex align-items-center justify-content-center">
+                        <div class="mb-3"><br>
+                          <button type="button" id="RefreshScript" class="btn btn-primary">Refresh Script</button>
+                        </div>
+                      </div>
+
+
+                      <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Symbol</th>
+                                    <th>Expiry Date</th>
+                                    <th>lotSize</th>
+                                    <th>Multiplier</th>
+                                    <th>optionType</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                    <th>Action</th>
+                                </tr>
+    
+                            </thead>
+                            <tbody>
+                                {% for script in scripts %}
+                                    <tr>
+                                        <td>{{ script.id }}</td>
+                                        <td><strong>{{ script.tradingSymbol }}</strong></td>
+                                        <td>{{ script.expiryDate }}</td>
+                                        <td> <input type="number" name="lot_size" size="5" value="{{ script.lotSize }}" class="lot_size_{{ script.script_code }}"> </td>
+                                        <td> <input type="number" name="lot_size" size="5" value="{{ script.multiplier }}" class="multiplier_{{ script.script_code }}"> </td>
+                                        <td>{{ script.optionType }}</td>
+                                        <td>{{ script.created_at }}</td>
+                                        <td>{{ script.updated_at }}</td>
+                                        <td> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="cursor: pointer;" class="icon icon-tabler icon-tabler-trash remove_script_from_app" data-script-id="{{ script.script_code }}" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M4 7l16 0"></path>
+                                                <path d="M10 11l0 6"></path>
+                                                <path d="M14 11l0 6"></path>
+                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                            </svg> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="cursor: pointer;"  data-script-id="{{ script.id }}" data-script-code="{{ script.script_code }}" class="save_script_data icon icon-tabler icon-tabler-device-floppy" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"></path>
+                                                <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                <path d="M14 4l0 4l-6 0l0 -4"></path>
+                                             </svg>
+                                        </td>
+                                            
+                                      
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                          
+                        </table>
+    
+                    </div>
+
+                    </div>
+                  </div>
+                </form>
+            </div>
+
+            </br>
+
+            <div class="card">
+                <div class="card-header">
+                  <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="#tabs-home-5" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
+                                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                             </svg> &nbsp;     
+                        App Settings</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <a href="#tabs-profile-5" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                            <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                            <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+                         </svg> &nbsp; 
+
+                        Account</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-body">
+                  <div class="tab-content">
+                    <div class="tab-pane active show" id="tabs-home-5" role="tabpanel">
+                      
+                        <div class="col-md-4">
+                            <div class="form-label bold-font ">App Name</div>
+                            <input type="text" name="app_name" class="form-control field_app_name" value="{{ app_name }}" >
+                            
+                            </br>
+                            <div class="form-label bold-font ">App Status</div>
+                            {% if app_status == "True" %}
+                            <label class="form-check form-switch"> 
+                                <input class="form-check-input activate_checkbox field_app_status" type="checkbox" checked> 
+                            </label>
+                            {% else %}
+                            <label class="form-check form-switch"> 
+                                <input class="form-check-input activate_checkbox field_app_status" type="checkbox" > 
+                            </label>
+                            {% endif %}
+                            
+                            </br>
+
+                            <div class="form-label bold-font ">App Transactions</div>
+                            {% if transaction_status == "True" %}
+                            <label class="form-check form-switch"> 
+                                <input class="form-check-input activate_checkbox field_transaction_status" type="checkbox" checked> 
+                            </label>
+                            {% else %}
+                            <label class="form-check form-switch"> 
+                                <input class="form-check-input activate_checkbox field_transaction_status" type="checkbox" > 
+                            </label>
+                            {% endif %}
+                            </br>
+
+                            <div class="form-label bold-font ">Host Name</div>
+                            <input type="text" name="host_name" class="form-control field_app_hostname" value="{{ hostname }}" >
+
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tabs-profile-5" role="tabpanel">
+                        
+                        <div class="col-md-4">
+                            <div class="form-label bold-font ">Initial Money Limit</div>
+                            <input type="number" name="limit" class="form-control field_app_limit" value="{{ initial_limit }}" >
+                        
+                            </br>
+
+                            <div class="form-label bold-font ">Can Sub-Admin Create User?</div>
+                            {% if canSubAdminCreateUser == "True" %}
+                                <label class="form-check form-switch"> 
+                                    <input class="form-check-input activate_checkbox field_app_canSubAdminCreateUser" type="checkbox" checked> 
+                                </label>
+                            {% else %}
+                                <label class="form-check form-switch"> 
+                                    <input class="form-check-input activate_checkbox field_app_canSubAdminCreateUser" type="checkbox" > 
+                                </label>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                    
+                    </br>
+                    <button type="button" class="btn btn-primary save_app_settings">Save</button>
+                    
+                  </div>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="page-pretitle">Opps, Sorry you are not allowed to edit this page.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endif  %}
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="playground"/>
+    <meta name="msapplication-TileColor" content="#206bc4"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+    
+    <title>{% block title %} {% endblock %}</title>
+     
+    {% comment %} CSS FIles {% endcomment %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="{% static 'css/customized_datatable.css' %}">
+    <link rel="stylesheet" href="{% static 'css/application.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" type="text/javascript" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/extensions/apexcharts-toolbar.min.js" type="application/javascript"></script>
+  
+</head>
+
+  <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+  <body class='theme-light'>
+    <div class="page">
+        <!-- Navbar -->
+        {% if 'login/' not in request.path %}
+          {% include 'header.html' %}
+        {% endif %}
+        
+        <!-- Body-->
+        {% block content %} {% endblock %}
+
+        <!-- Footer -->
+        {% include 'footer.html' %}
+
+    </div>
+	
+    {% comment %} Javscript FIles {% endcomment %}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <!-- <script src="{% static 'js/datatable.js' %}"></script> -->
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <!-- <script type="text/javascript" src="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script> -->
+    <script src="{% static 'js/jquery.websocket-0.0.1.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
+    <script src="{% static 'js/application.js' %}"></script>
+    
+
+   
+
+  </body>
+</html>

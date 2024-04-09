@@ -1,0 +1,54 @@
+{% extends '../base.html' %}
+
+{% load load_transaction_form %}
+
+{% block title %} Transactions | Playground Admin {% endblock %}
+
+{% block content %}
+
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">Overview</div>
+                    <h2 class="page-title"> Add Transactions </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Enter Transaction Details</h3>
+                </div>
+                
+                <div class="card-body p-8">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div style="margin-top:10px;">
+                                <label for="{{ field.name}}">{{ field.label}}</label>{{field|addcss:"form-control"}}
+                            </div>
+                        {% endfor %}
+                        <br>
+                        <input type="submit" class="btn btn-primary" value="Add Transaction">
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

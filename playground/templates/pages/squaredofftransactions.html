@@ -1,0 +1,101 @@
+{% extends '../base.html' %}
+
+{% block title %} Transactions | Playground Admin {% endblock %}
+
+{% block content %}
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+<div class="is_s_trasaction"></div>
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">Overview</div>
+                    <h2 class="page-title"> Squared Off Transactions </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Transactions List</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table datatable transaction_table">
+                        <thead>
+                            <tr>
+                                <th>Client ID</th>
+                                <th>Name</th>
+                                <th>Lot</th>
+                                <th>Multipler</th>
+                                <th>Profit/Loss</th>
+                                <th>Brokrage</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
+                                <th>Buy Time</th>
+                                <th>Sell Time</th>                                
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr data-script-id={{transaction.script_code}}>
+                                <td><a target="_blank" href="/user/{{ transaction.systemclient }}" > {{ transaction.client }} </a></td>
+                                <td>{{ transaction.name }}</td>
+                                <td>{{ transaction.lot }}</td>
+                                <td>{{ transaction.multipler }}</td>
+                                <td>
+                                    {% if transaction.profit_loss < 0 %}
+                                    <p style='color:#d63939' class="IndCurr"> {{ transaction.profit_loss }} </p>
+                                    {% else %}
+                                    <p style='color:#2fb344' class="IndCurr"> {{ transaction.profit_loss }} </p>
+                                    {% endif %}
+                                </td>
+                                <td class="IndCurr">{{ transaction.brokrage }}</td>
+                                <td class="IndCurr">{{ transaction.buy_price }}</td>
+                                <td class="IndCurr">{{ transaction.sell_price }}</td>
+                                <td>{{ transaction.buy_time | date:"M d, Y h:m" }}</td>
+                                <td>{{ transaction.sell_time | date:"M d, Y h:m" }}</td>
+                     
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                        <tbody>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th class="IndCurr"></th>
+                                    <th class="IndCurr"></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

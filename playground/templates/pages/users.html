@@ -1,0 +1,276 @@
+{% extends '../base.html' %}
+
+{% block title %} Users | Playground Admin {% endblock %}
+
+{% block content %}
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">Overview</div>
+                    <h2 class="page-title"> Users </h2>
+                </div>
+
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        <a id="fetchRecords" class="btn d-none d-sm-inline-block">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                                <path d="M21 21l-6 -6"></path>
+                             </svg>
+                            Seach
+                        </a>
+
+                        <span class="d-none d-sm-inline">
+                            <a href="" target="_blank" class="btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z">
+                                    </path>
+                                    <path d="M8 11h8v7h-8z"></path>
+                                    <path d="M8 15h8"></path>
+                                    <path d="M11 11v7"></path>
+                                </svg>
+                                Export Records
+                            </a>
+                        </span>
+                        
+
+                        <a id="fetchRecords" class="btn btn-primary d-none d-sm-inline-block" href="#" data-bs-toggle="modal" data-bs-target="#new_user">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                <path d="M16 19h6"></path>
+                                <path d="M19 16v6"></path>
+                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4"></path>
+                             </svg>
+                            Add New User
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Users List</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th>ClientID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Sub-Admin</th>
+                                <th>Limit</th>
+                                <th>Total Orders</th>
+                                <th>Last Login</th>
+                                <th>Active</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            {% for client in users %}
+                                <tr>
+                                    <td>{{ client.user.username }}</td>
+                                    <td>{{ client.user.first_name }}</td>
+                                    <td>{{ client.user.email }}</td>
+                                    <td>{{ client.user.phone }}</td>
+                                    {% if client.user.is_staff %}
+                                        <td><span class="badge bg-success me-1"> YES </span></td>
+                                    {% else %}
+                                        <td><span class="badge bg-danger me-1"> NO </span></td>
+                                    {% endif %}
+                                    
+                                    <td>₹ {{ client.limit }}</td>
+                                    <td>{{ client.active_transaction_count }}</td>
+                                    <td>{{ client.user.last_login }}</td>
+
+
+                                    {% if client.user.is_active %}
+                                        <td>
+                                            <label class="form-check form-switch">
+                                            <input class="form-check-input deactivate_checkbox" data-id="{{ client.user.username }}" type="checkbox" checked>
+                                            </label>
+                                        </td>
+                                    {% else %}
+                                    <td>
+                                        <label class="form-check form-switch">
+                                          <input class="form-check-input deactivate_checkbox" data-id="{{ client.user.username }}" type="checkbox">
+                                        </label>
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        {% if client.user.is_active %}
+                                        <a href="/user/{{ client.client_id }}" class="edit_user_info">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                                <path d="M16 5l3 3"></path>
+                                            </svg>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                      
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal modal-blur fade" id="new_user" tabindex="-1" aria-labelledby="new_userLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">User Registration</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="./" method="POST">
+        <div class="modal-body">
+            
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" name="client_name" placeholder="Your Client name" required>
+                </div>
+            
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="client_email" placeholder="Enter Email Address">
+                    </div>
+            
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <input type="phone" class="form-control" name="client_phone" placeholder="Phone Number">
+                    </div>
+                </div>
+                </br>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Initial Limit</label>
+                        <input type="number" id="client_limit_input" class="form-control" name="client_limit" placeholder="" value="{{ defaultLimit }}" readonly="readonly">
+                    </div>
+
+                    <div class="col-md-8" style="padding-top:12px;">
+                            <div class="form-label">Client Role</div>
+                            <div>
+                            <label class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="client_role" value="normal_client" checked="">
+                                <span class="form-check-label">Normal Client</span>
+                            </label>
+                            
+                            {% if client.user.is_superuser %}
+                            <label class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" value="sub_admin" name="client_role">
+                                <span class="form-check-label">Sub Admin</span>
+                            </label>
+                            {% endif %}
+                            </div>
+                    </div>
+                </div>
+            
+            </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+<!-- Deactivate User Modal -->
+<div class="modal modal-blur fade" id="deactivate_user" tabindex="-1" data-keyboard="false" data-backdrop="static" aria-labelledby="deativate_userLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-warning"></div>
+            <div class="modal-body text-center py-4">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler mb-2 text-warning icon-lg icon-tabler-alert-triangle-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M11.94 2a2.99 2.99 0 0 1 2.45 1.279l.108 .164l8.431 14.074a2.989 2.989 0 0 1 -2.366 4.474l-.2 .009h-16.856a2.99 2.99 0 0 1 -2.648 -4.308l.101 -.189l8.425 -14.065a2.989 2.989 0 0 1 2.555 -1.438zm.07 14l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" stroke-width="0" fill="currentColor"></path>
+                 </svg>
+                <h3>Are you sure?</h3>
+              <div class="text-muted">Do you really want to deactivate client? </div>
+              <font class="text-muted">Client ID - <strong class="clientid"></strong><font>
+            </div>
+            <div class="modal-footer">
+              <div class="w-100">
+                <div class="row">
+                    <div class="col">
+                        <button class="cancel btn w-100"> Cancel </button>
+                    </div>
+                    <div class="col">
+                        <button class="ok btn btn-warning w-100"> Deactivate </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+<!-- Activate User Modal -->
+<div class="modal modal-blur fade" id="activate_user" tabindex="-1" data-keyboard="false" data-backdrop="static" aria-labelledby="ativate_userLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-warning"></div>
+            <div class="modal-body text-center py-4">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler mb-2 text-warning icon-lg icon-tabler-alert-triangle-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M11.94 2a2.99 2.99 0 0 1 2.45 1.279l.108 .164l8.431 14.074a2.989 2.989 0 0 1 -2.366 4.474l-.2 .009h-16.856a2.99 2.99 0 0 1 -2.648 -4.308l.101 -.189l8.425 -14.065a2.989 2.989 0 0 1 2.555 -1.438zm.07 14l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" stroke-width="0" fill="currentColor"></path>
+                 </svg>
+                <h3>Are you sure?</h3>
+              <div class="text-muted">Do you really want to Activate client? </div>
+              <font class="text-muted">Client ID - <strong class="clientid"></strong><font>
+            </div>
+            <div class="modal-footer">
+              <div class="w-100">
+                <div class="row">
+                    <div class="col">
+                        <button class="cancel btn w-100"> Cancel </button>
+                    </div>
+                    <div class="col">
+                        <button class="ok btn btn-warning w-100"> Activate </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+{% endblock %}

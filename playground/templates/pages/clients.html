@@ -1,0 +1,289 @@
+{% extends '../base.html' %}
+
+{% block title %} Transactions | Playground Admin {% endblock %}
+
+{% block content %}
+
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+{{ scripts |json_script:"my_array" }}
+{{ transactions |json_script:"my_transactions" }}
+
+<script> 
+    
+    transactions = JSON.parse(document.getElementById('my_transactions').textContent);
+    // console.log(JSON.parse(document.getElementById('my_array').textContent));
+    script_data = JSON.parse(document.getElementById('my_array').textContent);
+    //var script_data = JSON.parse(document.getElementById('my_array').textContent);
+    var scripts_subscribe = [];
+
+
+    script_data.forEach(function(item, index){
+        scripts_subscribe.push("MX"+item.script_code);
+    });
+
+    console.log("scripts_subscribe", scripts_subscribe);
+
+</script>
+
+<script>        
+
+        setInterval(()=>{
+
+            var bit_min_offer = 0;
+            var numberoflot_with_mainprice = 0;
+            var lot_total = 0;
+            var profit_lose_data = 0;
+
+            const tableBody = document.querySelector('.users_table tbody');
+            const rowsToUpdate = tableBody.querySelectorAll(`tr`);
+            
+            rowsToUpdate.forEach(row => {
+                const filteredTransactions = transactions.filter((transaction) => {
+                    return transaction.client === row.getAttribute("data-client-id");
+                });
+
+                var client_id =  row.getAttribute("data-client-id");
+                var client_limit = row.getAttribute("data-current-limit");
+                var transactions_obj = [];
+                
+                prfit_loss = 0
+                filteredTransactions.forEach(row => {
+
+                    // transactions_obj = [];
+                    script_data = JSON.parse(getCookie(row.script_code))
+                    
+                    mybidprice = row['bidPrice'];
+                    myofferPrice = row['offerPrice'];
+                    myaction = row['action'];
+                    mylotsize = row['quantity'];
+                    mymultiples = row['multiplier'];
+                    
+                    if( script_data ){
+                        live_offerprice = script_data.offPrice;
+                        live_bidprice = script_data.bidPrice;
+
+                        if( myaction == "Buy" ){
+
+                            bit_min_offer = 0;
+                            numberoflot_with_mainprice = 0;
+                            lot_total = 0;
+                            profit_lose_data = 0;
+                            
+                            bit_min_offer = parseInt(live_bidprice) - parseInt(myofferPrice);
+                            numberoflot_with_mainprice = parseInt(bit_min_offer) * parseInt(mymultiples) * parseInt(mylotsize);
+                            lot_total = 200 * parseInt(mylotsize);
+                            profit_lose_data = parseInt(numberoflot_with_mainprice) - parseInt(lot_total);
+
+
+                            if( profit_lose_data ){
+                                prfit_loss += profit_lose_data;
+                                transactions_obj.push(
+                                    { "transaction_id": row.transaction_id, "profit_loss": profit_lose_data }
+                                );
+                            }
+    
+                        } else {
+
+                            bit_min_offer = 0;
+                            numberoflot_with_mainprice = 0;
+                            lot_total = 0;
+                            profit_lose_data = 0;
+                            
+                            bit_min_offer = parseInt(mybidprice) - parseInt(live_offerprice);
+                            numberoflot_with_mainprice = parseInt(bit_min_offer) * parseInt(mymultiples) * parseInt(mylotsize);
+                            lot_total = 200 * parseInt(mylotsize);
+                            sell_profit_lose_data = parseInt(numberoflot_with_mainprice) - parseInt(lot_total); 
+                            
+                            if(sell_profit_lose_data){
+                                prfit_loss += sell_profit_lose_data;
+                                transactions_obj.push(
+                                    { "transaction_id": row.transaction_id, "profit_loss": sell_profit_lose_data }
+                                );
+                            }
+
+                        }
+                    }
+                    
+                    
+
+                });
+                profit_loss_column = row.querySelector('.profit_loss')
+
+                if(prfit_loss < 0){
+                    profit_loss_column.innerHTML = "<p style='color:#d63939'>" + toIndianCurrency(prfit_loss)  +" </p>"
+
+                    if( parseInt(prfit_loss) <= 0  ){
+                        CheckProfitloass = parseInt(client_limit) + parseInt(prfit_loss);
+                        if( CheckProfitloass < 0  ){
+                            console.log("Loss ", CheckProfitloass)
+                            data_for_squareoff = {
+                                "client_id": client_id,
+                                "transactions": transactions_obj
+                            }
+                            squareoftransactions(data_for_squareoff);
+                        }else{
+                            console.log("update limit ", CheckProfitloass)
+                            row.querySelector(".client_limit").innerHTML = toIndianCurrency(CheckProfitloass)
+                        }
+                    }
+                    
+
+                }else{
+
+                    CheckProfitloass = parseInt(client_limit) + parseInt(prfit_loss);
+                    row.querySelector(".client_limit").innerHTML =  toIndianCurrency(CheckProfitloass)
+                    profit_loss_column.innerHTML = "<p style='color:#2fb344'>" + toIndianCurrency(prfit_loss)  +" </p>"
+                }
+                
+            });
+
+        }, 1000);
+
+
+        
+        setTimeout(() => {
+
+            //var access_token = "eyJ0eXAiOiJzZWMiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJneTZOU2xzeXhrQW94dlpLWE96b053L0pFOVZGaG1OVDB0YjUwTFJBYWgyMzNWMzBpOTJGUm5aRnVwL1J3MzF1bHFwTmw1NUN4YlVQWmQybkc0Qnk0cTRlZ3lmdElrejJYWi8zUm5yYnF0ZWlzQzhHYkdaRTRTQmpvcU8rVFptWHNXNzQ2c1hIZExvTHY3bjVzdUVLYUxmcWgrOUUvSlE5SHlLMlg1WWlJOVk9IiwiaWF0IjoxNjg5MzE3NzAwLCJleHAiOjE2ODk0MDQxMDB9.1RQsq3O6ifjXfqQG0U83hBlD26qiJ0VTHIVr7NVrkz8";
+            var access_token = "{{ api_token }}";
+            //  console.log("access_token", access_token) 
+            var api_key = "2ndfeZojiGUjxuBaHvjsvwG7UIS4CZhH";
+            var ws = new WebSocket("wss://stream.sharekhan.com/skstream/api/stream?ACCESS_TOKEN=" + access_token + "&API_KEY=" + api_key );
+
+            ws.onopen = function() {
+                console.log("Connected to WebSocket server");
+
+                ws.send(JSON.stringify({
+                    "action" : "subscribe",
+                    "key" : [ "feed" ],
+                    "value" : [ "" ]
+                }));
+
+                data_from_api = ws.send(JSON.stringify({
+                    "action" : "feed",
+                    "key" : [ "full" ],
+                    "value" : scripts_subscribe
+                }));
+            };
+
+            
+            ws.onmessage = function(event) {
+                var message = event.data;
+                // Call a function to process the received message
+                if( message != "heartbeat" ){
+                    processMessage(message);
+                }
+            };
+            
+        }, 2000);
+
+        
+        function processMessage(message) {
+            
+            message_json = JSON.parse(message);
+            jsonData = {
+                "bidPrice": message_json['data']['bidPrice'],
+                "offPrice": message_json['data']['offPrice']
+            }
+            setCookie(message_json['data']['scripCode'], JSON.stringify(jsonData))
+        }
+
+        function setCookie(name,value,days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        function eraseCookie(name) {   
+            document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+
+</script>
+
+
+<div class="page-wrapper">
+
+    <div class="check_new_transaction"></div>
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">Overview</div>
+                    <h2 class="page-title"> All Clients </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Clients List</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table datatable users_table">
+                        <thead>
+                            <tr>
+                                <th>Client ID</th>
+                                <th>Name</th>
+                                <th>Active Transactions</th>
+                                <th>Profic/Loss</th>
+                                <th>Total Limit</th>
+                                <th>Action</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr data-client-id={{user.client_id}} data-current-limit={{user.limit}}>
+                                <td><a target="_blank" href="/user/{{ user.client_id }}" > {{ user.user }}</a></td>
+                                <td>{{ user.user.first_name }}</td>
+                                <td>{{ user.active_transaction_count }}</td>
+                                <td class="profit_loss">{{ 0 }}</td>
+                                <td class="client_limit" >{{ user.limit }}</td>
+                                <td>Action</td>
+                                <td><a target="_blank" href="/user/{{ user.parent_id }}" > {{ user.parent_id }}</a></td>
+                                <td>{{ user.user.date_joined | date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                        <tbody>
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

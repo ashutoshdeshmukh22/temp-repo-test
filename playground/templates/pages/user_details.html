@@ -1,0 +1,168 @@
+{% extends '../base.html' %}
+
+{% block title %} User Details | Melody {% endblock %}
+
+{% block content %}
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">User Details</div>
+                    <h2 class="page-title"> {{ request_client.user.first_name }}</h2>
+                </div>
+
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        
+                        <span class="d-none d-sm-inline">
+                            <a href="javascript:void(0);" target="_blank" class="btn single_user_edit_info">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                    <path d="M16 5l3 3"></path>
+                                 </svg>
+                                Edit User
+                            </a>
+                        </span>
+                        
+
+                        <a id="fetchRecords" class="btn btn-danger d-none d-sm-inline-block mark_as_in_active_user" href="#" data-bs-toggle="modal" data-bs-target="#new_user">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M4 7l16 0"></path>
+                                <path d="M10 11l0 6"></path>
+                                <path d="M14 11l0 6"></path>
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                             </svg>
+                            Delete User
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body display_inline_flex">
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Client ID</div>
+                        <input type="text" name="client_id" class="form-control edit_info_client_id" value="{{ request_client.user.username }}" disabled>
+                    </div>
+                    
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Name</div>
+                        <input type="text" name="name" class="form-control edit_info_firstname" value="{{ request_client.user.first_name }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Email</div>
+                        <input type="email" name="email" class="form-control edit_info_email" value="{{ request_client.user.email }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Phone</div>
+                        <input type="text" name="phone" class="form-control edit_info_phone" value="{{ request_client.phone }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    <div class="col-md">
+                        <div class="form-label bold-font ">Limit</div>
+                        <input type="number" name="limit" class="form-control edit_info_limit" value="{{ request_client.limit }}" disabled>
+                    </div>
+
+                    <div class="p-3"></div>
+                    
+                    <div class="col-md"><br>
+                        <input type="button" name="cancel" class="btn" value="Cancel"/>&nbsp;&nbsp; 
+                        <input type="button" name="update" class="btn btn-primary edit_user_info_update_btn" value="Update"/>
+                    </div>
+
+
+                </div>
+            </div>
+
+            </br>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Transactions</div>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table datatable">
+                            <thead>
+                                <tr>
+                                    <th>Script Code</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Lot</th>
+                                    <th>Multiplier</th>
+                                    <th>Total</th>
+                                    <th>Offer Price</th>
+                                    <th>Bid Price</th>
+                                    <th>Profic/Loss</th>
+                                    <th>Action</th>
+                                    <th>Created By</th>
+                                    <th>Created At</th>
+                                    <th>Client ID</th>
+                                </tr>
+    
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction.script_code }}</td>
+                                    <td>{{ transaction.name }}</td>
+                                    <td>{{ transaction.quantity }}</td>
+                                    <td>{{ transaction.lotSize }}</td>
+                                    <td>{{ transaction.multiplier }}</td>
+                                    <td><font color="#2fb344">₹ {{ transaction.price }}</font></td>
+                                    <td>{{ transaction.offerPrice }}</td>
+                                    <td>{{ transaction.bidPrice }}</td>
+                                    <td> {{ transaction.profit_loss  }} </td>
+                                 
+                                    {% if transaction.action == "Buy"  %}
+                                        <td><span class="badge bg-success me-1"> Buy </span></td>
+                                    {% else %}
+                                        <td><span class="badge bg-danger me-1"> Sell </span></td>
+                                    {% endif %}
+    
+                                    <td>{{ transaction.created_by }}</td>
+                                    <td>{{ transaction.created_at | date:"M d, Y" }}</td>
+                                    <td><a target="_blank" href="/user/{{ transaction.client.client_id }}" > {{ transaction.client }} </a></td>
+                                </tr>
+                                {% endfor %}
+    
+                            </tbody>
+                            <tbody>
+    
+    
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

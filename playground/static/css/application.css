@@ -1,0 +1,35 @@
+.IndCurr:before {
+    content: "₹";
+}
+
+
+body {
+    
+    font-family: 'Inter';
+}
+
+.table-responsive{
+    padding: 10px;
+}
+
+.float-right{
+    float: right;
+}
+
+.export_button{
+    display: none;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.export_button.friday{
+    display: block;
+}
+
+.display_inline_flex{
+    display: inline-flex;
+}
+
+.bold-font {
+    font-weight: bold;
+}

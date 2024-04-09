@@ -1,0 +1,280 @@
+{% extends '../base.html' %}
+
+{% block title %} Transactions | Playground Admin {% endblock %}
+
+{% block content %}
+
+
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+{{ scripts |json_script:"my_array" }}
+
+<script>
+
+    // console.log(JSON.parse(document.getElementById('my_array').textContent));
+    script_data = JSON.parse(document.getElementById('my_array').textContent);
+    // console.log(script_data);
+
+    //var script_data = JSON.parse(document.getElementById('my_array').textContent);
+    var scripts_subscribe = [];
+
+
+    script_data.forEach(function (item, index) {
+        scripts_subscribe.push("MX" + item.script_code);
+    });
+
+    // console.log("scripts_subscribe", scripts_subscribe);
+
+</script>
+
+<script>
+
+
+    setTimeout(() => {
+        //var access_token = "eyJ0eXAiOiJzZWMiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJneTZOU2xzeXhrQW94dlpLWE96b053L0pFOVZGaG1OVDB0YjUwTFJBYWgyMzNWMzBpOTJGUm5aRnVwL1J3MzF1bHFwTmw1NUN4YlVQWmQybkc0Qnk0cTRlZ3lmdElrejJYWi8zUm5yYnF0ZWlzQzhHYkdaRTRTQmpvcU8rVFptWHNXNzQ2c1hIZExvTHY3bjVzdUVLYUxmcWgrOUUvSlE5SHlLMlg1WWlJOVk9IiwiaWF0IjoxNjg5MzE3NzAwLCJleHAiOjE2ODk0MDQxMDB9.1RQsq3O6ifjXfqQG0U83hBlD26qiJ0VTHIVr7NVrkz8";
+        var access_token = "{{ api_token }}";
+        //  console.log("access_token", access_token) 
+        var api_key = "2ndfeZojiGUjxuBaHvjsvwG7UIS4CZhH";
+        var ws = new WebSocket("wss://stream.sharekhan.com/skstream/api/stream?ACCESS_TOKEN=" + access_token + "&API_KEY=" + api_key);
+
+        ws.onopen = function () {
+            // console.log("Connected to WebSocket server");
+
+            ws.send(JSON.stringify({
+                "action": "subscribe",
+                "key": ["feed"],
+                "value": [""]
+            }));
+
+            data_from_api = ws.send(JSON.stringify({
+                "action": "feed",
+                "key": ["full"],
+                "value": scripts_subscribe
+            }));
+        };
+
+
+        ws.onmessage = function (event) {
+            var message = event.data;
+            // Call a function to process the received message
+            if (message != "heartbeat") {
+                processMessage(message);
+            }
+        };
+
+    }, 2000);
+
+    function processMessage(message) {
+
+        var message_json = JSON.parse(message);
+        var bit_min_offer = 0;
+        var numberoflot_with_mainprice = 0;
+        var lot_total = 0;
+        var profit_lose_data = 0;
+
+        const tableBody = document.querySelector('.transaction_table tbody');
+
+        const rowsToUpdate = tableBody.querySelectorAll(`tr[data-script-id="${message_json['data']['scripCode']}"]`);
+        //const rowsToUpdate = tableBody.querySelectorAll(`tr[data-script-id="245896"]`);
+
+        if (rowsToUpdate.length != 0) {
+            rowsToUpdate.forEach(row => {
+
+                const transaction_data = row.querySelector(`td[data-script_code="${message_json['data']['scripCode']}"]`);
+                // console.log("row ", row);
+
+                mybidprice = transaction_data.getAttribute('data-bidprice');
+                myofferPrice = transaction_data.getAttribute("data-offerPrice");
+                myaction = transaction_data.getAttribute("data-action");
+                mylotsize = transaction_data.getAttribute("data-lot-size");
+                mymultiples = transaction_data.getAttribute("data-multiples");
+
+                live_offerprice = message_json.data.offPrice;
+                live_bidprice = message_json.data.bidPrice;
+
+                if (myaction == "Buy") {
+
+                    bit_min_offer = 0;
+                    numberoflot_with_mainprice = 0;
+                    lot_total = 0;
+                    profit_lose_data = 0;
+
+                    bit_min_offer = parseInt(live_bidprice) - parseInt(myofferPrice);
+                    numberoflot_with_mainprice = parseInt(bit_min_offer) * parseInt(mymultiples) * parseInt(mylotsize);
+                    lot_total = 200 * parseInt(mylotsize);
+                    profit_lose_data = parseInt(numberoflot_with_mainprice) - parseInt(lot_total);
+
+                    if (profit_lose_data) {
+                        if (profit_lose_data < 0) {
+                            // transaction_data.innerHTML = "<p style='color:#d63939'>" + toIndianCurrency(profit_lose_data) + " </p>"
+                            $(row).find('td.prof_loss_' + message_json['data']['scripCode']).html("<p style='color:#d63939'>" + toIndianCurrency(profit_lose_data) + " </p>");
+                        } else {
+                            // transaction_data.innerHTML = "<p style='color:#2fb344'>" + toIndianCurrency(profit_lose_data) + " </p>"
+                            $(row).find('td.prof_loss_' + message_json['data']['scripCode']).html("<p style='color:#2fb344'>" + toIndianCurrency(profit_lose_data) + " </p>");
+                        }
+                    }
+
+                } else {
+                    bit_min_offer = 0;
+                    numberoflot_with_mainprice = 0;
+                    lot_total = 0;
+                    profit_lose_data = 0;
+
+                    bit_min_offer = parseInt(mybidprice) - parseInt(live_offerprice);
+                    numberoflot_with_mainprice = parseInt(bit_min_offer) * parseInt(mymultiples) * parseInt(mylotsize);
+                    lot_total = 200 * parseInt(mylotsize);
+                    sell_profit_lose_data = parseInt(numberoflot_with_mainprice) - parseInt(lot_total);
+
+                    if (sell_profit_lose_data) {
+                        if (sell_profit_lose_data < 0) {
+                            // transaction_data.innerHTML = "<p style='color:#d63939'>" + toIndianCurrency(sell_profit_lose_data) + " </p>"
+                            $(row).find('td.prof_loss_' + message_json['data']['scripCode']).html("<p style='color:#d63939'>" + toIndianCurrency(sell_profit_lose_data) + " </p>");
+                        } else {
+                            // transaction_data.innerHTML = "<p style='color:#2fb344'>" + toIndianCurrency(sell_profit_lose_data) + " </p>"
+                            $(row).find('td.prof_loss_' + message_json['data']['scripCode']).html("<p style='color:#2fb344'>" + toIndianCurrency(sell_profit_lose_data) + " </p>");
+                        }
+                    }
+                }
+
+                sum = 0;
+                $('.datatable tbody tr').each(function () {
+                    var value = parseFloat($(this).find('td:eq(5) p').text());
+                    if (!isNaN(value)) {
+                        sum += value;
+                    }
+                });
+                $(".final_total").html(sum)
+
+            });
+        }
+    }
+</script>
+
+<div class="is_trasaction"></div>
+<div class="page-wrapper">
+
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row align-items-center">
+                <div class="col">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">Overview</div>
+                    <h2 class="page-title"> Transactions </h2>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+
+                        <span class="d-none d-sm-inline">
+                            <a href="/add_transaction/" target="_blank" class="btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit"
+                                    width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z">
+                                    </path>
+                                    <path d="M16 5l3 3"></path>
+                                </svg>
+                                Add Transaction
+                            </a>
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <style>
+        .export_button_custom_datatable {
+            display: none;
+        }
+
+        button.btn.btn-primary.float-right.export_button_custom {
+            position: absolute;
+            right: 24px;
+        }
+    </style>
+
+    <div class="container-xl">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Transactions List</h3>
+                    <button class="btn btn-primary float-right export_button_custom">Export</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table datatable transaction_table">
+                        <thead>
+                            <tr>
+                                <th>Client ID</th>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Offer Price</th>
+                                <th>Bid Price</th>
+                                <th>Profic/Loss</th>
+                                <th>Limit</th>
+                                <th>Action</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr data-script-id={{transaction.script_code}}>
+                                <td><a target="_blank" href="/user/{{ transaction.client.client_id }}"> {{ transaction.client }} </a></td>
+                                <td>{{ transaction.name }}</td>
+                                <td>{{ transaction.quantity }}</td>
+                                <td class="IndCurr">{{ transaction.offerPrice }}</td>
+                                <td class="IndCurr">{{ transaction.bidPrice }}</td>
+                                <td class="prof_loss prof_loss_{{ transaction.script_code }}"
+                                    data-bidprice="{{ transaction.bidPrice }}"
+                                    data-offerPrice="{{ transaction.offerPrice }}"
+                                    data-action="{{ transaction.action }}" data-multiples="{{ transaction.multiplier }}"
+                                    data-script_code="{{ transaction.script_code }}"
+                                    data-lot-size="{{ transaction.quantity }}" data-totalprice="{{ transaction.price }}"
+                                    data-brokerage="200">0</td>
+
+                                <td class="IndCurr">10000</td>
+                                {% if transaction.action == "Buy" %}
+                                <td><span class="badge bg-success me-1"> Buy </span></td>
+                                {% else %}
+                                <td><span class="badge bg-danger me-1"> Sell </span></td>
+                                {% endif %}
+
+                                <td>{{ transaction.created_by }}</td>
+                                <td>{{ transaction.created_at | date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th class="IndCurr final_total">0</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
