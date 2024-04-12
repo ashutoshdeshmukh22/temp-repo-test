@@ -1,0 +1,104 @@
+# version: '3'
+# services:
+#   db:
+#     image: mysql:5.7
+#     container_name: melodybazar_db
+#     restart: always
+#     volumes:
+#       - data:/var/lib/mysql
+#     environment:
+#       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+#       MYSQL_DATABASE: ${DB_NAME}
+#       # MYSQL_USER: ${DB_USER}
+#       # MYSQL_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "3306:3306"
+#     healthcheck:
+#       test:
+#         [
+#           "CMD",
+#           "mysql",
+#           "-h",
+#           "localhost",
+#           "-u",
+#           "root",
+#           "-p${DB_PASSWORD}",
+#           "-e",
+#           "SELECT 1"
+#         ]
+#       timeout: 20s
+#       retries: 10
+
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: melodybazar
+#     command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+#     restart: always
+#     volumes:
+#       - .:/app
+#     ports:
+#       - "5000:5000"
+#     env_file:
+#       - .env
+#     depends_on:
+#       - db
+# volumes:
+#   data:
+
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: melodybazar
+    volumes:
+      - static:/app/staticfiles
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - web_nw
+      - nginx_nw
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      # MYSQL_USER: ${DB_USER}
+      # MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - web_nw
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx/
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - static:/app/staticfiles
+    networks:
+      - nginx_nw
+
+volumes:
+  mysql:
+    external: true
+  static:
+    external: true
+
+networks:
+  web_nw:
+    external: true
+  nginx_nw:
+    external: true

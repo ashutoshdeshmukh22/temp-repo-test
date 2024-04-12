@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-k^pnqu9zb44m%*ovt@=j((kij_2xwz5pqi@^dt^gb%!by9k+ru
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', '154.41.254.112']
+ALLOWED_HOSTS = ['127.0.0.1', '154.41.254.112', 'localhost']
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 AUTO_LOGOUT_DELAY = 180 # Minutes
@@ -117,8 +117,8 @@ DATABASES = {
         'NAME': os.environ.get('DB_NAME'),
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'HOST': 'db',
+        # 'PORT': '3306' 
     }
 }
 
